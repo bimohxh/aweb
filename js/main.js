@@ -3,27 +3,60 @@ $(function () {
   APP = new Vue({
     el: 'body',
     data: {
-      repos: []
+      repos: [],
+      isring: false
     },
     methods: {
       submit () {
-        APP.repos = []
+        var keyword = APP.keyword
+        if (keyword.trim() === '') {
+          listLatest()
+        } else {
+          listSearch()
+        }
       }
     }
   })
 
 
-  init()
+  listLatest()
 })
 
-function init() {
-  $.post('http://192.168.26.128:2000/api/latest', {}, function(data) {
+function listLatest() {
+  var storeList = store.get('latestrepos')
+  if (storeList) {
+    APP.repos = storeList
+    return
+  } else {
+    APP.isring = true
+  }
+  
+  $.get('http://192.168.141.128:3000/api/latest', {}, function(data) {
+    data.items.forEach(function(item) {
+      item.fresh = freshData(item.pushed_at)
+    })
+    if (!storeList) {
+      APP.repos = data.items
+      APP.isring = false
+    }
+    store.set('latestrepos', data.items)
+    
+  })
+}
+
+
+
+function listSearch() {
+  APP.isring = true
+  $.get('http://192.168.141.128:3000/api/search?q=' + APP.keyword, {}, function(data) {
     data.items.forEach(function(item) {
       item.fresh = freshData(item.pushed_at)
     })
     APP.repos = data.items
+    APP.isring = false
   })
 }
+
 
 
 // 获取更新频率
