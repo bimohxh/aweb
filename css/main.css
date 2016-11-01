@@ -1,0 +1,30 @@
+* {
+  font-family: Helvetica, Arial, "PingFang SC", "Noto Sans", Roboto, "Microsoft Yahei", sans;
+}
+
+.searchTxt {
+  width: 480px;
+  padding: 10px;
+  outline: none;
+  border: 0;
+  position: fixed; 
+  top: 0;
+  border-bottom: #DDD 1px solid;
+  font-size: 30px;
+  
+}
+
+.list-wraper {
+   width: 500px;
+   padding-top: 40px;
+}
+
+.repo-item {
+  margin: 10px 0;
+}
+
+.repo-item .cover {
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+}
