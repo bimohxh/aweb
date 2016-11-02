@@ -1,9 +1,14 @@
 var APP;
-$(function() {
+$(function () {
   APP = new Vue({
     el: 'body',
     data: {
       repos: []
+    },
+    methods: {
+      submit () {
+        APP.repos = []
+      }
     }
   })
 
@@ -12,7 +17,7 @@ $(function() {
 })
 
 function init() {
-  $.post('http://192.168.141.128:3000/api/latest', {}, function(data) {
+  $.post('http://192.168.26.128:2000/api/latest', {}, function(data) {
     data.items.forEach(function(item) {
       item.fresh = freshData(item.pushed_at)
     })

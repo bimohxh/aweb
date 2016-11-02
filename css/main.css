@@ -17,16 +17,25 @@
 }
 
 .list-wraper {
-   width: 500px;
-   padding-top: 40px;
+   width: 400px;
+   padding-top: 50px;
+   min-height: 400px;
 }
+ 
 
 .repo-item {
   margin: 10px 0;
-  padding-left: 60px;
   position: relative;
   overflow: hidden;
   min-height: 60px;
+  padding-right: 30px;
+  border-bottom: #DDD 1px solid;
+  padding-bottom: 10px;
+  
+}
+
+.repo-item .innner {
+  padding-left: 60px;
 }
 
 .repo-item .cover {
@@ -38,11 +47,25 @@
 }
 
 .repo-item h3 {
-  margin: 0;
+  margin: 2px 0;
+  margin-bottom: 0;
+
+  font-size: 17px
 }
 
 .repo-item .desc {
   color: #a2a2a2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.repo-item .category {
+  color: #444;
+  background-color: #EEE;
+  padding: 5px 10px;
+  border-radius: 2px;
+  font-size: 12px;
 }
 
 .fresh {
@@ -53,7 +76,7 @@
   height: 15px;
   position: absolute;
   right: 0;
-  top: 10px;
+  top: 30px;
 }
 
 .fresh.often {
@@ -62,4 +85,8 @@
 
 .fresh.outdated {
   background-color: #FFBCBC;
+}
+
+.loading-list {
+  margin-top: 50px
 }
