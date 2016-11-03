@@ -1,5 +1,5 @@
 var APP;
-var baseUrl = 'http://192.168.26.128:2000/'
+var baseUrl = 'http://192.168.141.128:3000/'
 var keymap = {
   'top': listTop,
   's': listSubject
@@ -21,8 +21,10 @@ $(function () {
         } else {
           listSearch()
         }
-      },
-      keyChange () {
+      }
+    },
+    watch: {
+      keyword: function () {
         if (APP.keyword[0] === ':') {
           var func = keymap[APP.keyword.substring(1)]
           if (typeof func === 'function') {

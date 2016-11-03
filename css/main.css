@@ -100,3 +100,8 @@ kbd {
   padding: 5px 10px;
   border-radius: 4px;
 }
+
+.sub-item {
+  text-align: center;
+  border-bottom: #DDD 1px solid;
+}
