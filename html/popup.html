@@ -7,9 +7,9 @@
     
   </head>
   <body>
-    <input type="text" placeholder="Type keyowrd and press enter key" class="searchTxt" @keyup.13="submit()" v-model="keyword">
+    <input type="text" id="searchTxt" autofocus placeholder="Type keyowrd and press enter key" class="searchTxt" @keyup="keyChange()" @keyup.13="submit()" v-model="keyword">
     <div class="list-wraper">
-      <div class="repo-item" v-for="item in repos" v-show="!isring">
+      <div class="repo-item" v-for="item in repos" v-show="view == 'repos' && !isring">
         <div class="innner">
           <img class="cover" src="{{item.cover_path}}@1e_50w_50h_1c_0i_1o_1x.png">
           <span class="fresh {{item.fresh[0]}}" title="{{item.fresh[1]}}"></span>
@@ -33,10 +33,28 @@
         <div></div>
         <div></div>
       </div>
+
+      <! --专题列表 -->
+      <div class="subject" v-show="view == 'subject'">
+        <div class="sub-item" v-for="item in subs">
+          <h4>{{item.key}}</h4>
+        </div>
+      </div>
+
+
+      <! --命令说明 -->
+      <div v-show="view == 'help'">
+          <h3>命令模式</h3>
+          <p><kbd>:s</kbd> 获取所有专题 </p>
+          <p><kbd>:s[:专题名]</kbd> 获取具体某个专题</p>
+          <p><kbd>:top</kbd> 获取前端 top100 框架</p>
+          
+      </div>
     </div>
     <script src="../js/jquery.js"></script>
     <script src="../js/vue.min.js"></script>
     <script src="../js/store.min.js"></script>
+    <script src="../js/jquery.hotkeys.js"></script>
     <script src="../js/main.js"></script>
   </body>
 </html>

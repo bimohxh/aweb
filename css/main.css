@@ -1,5 +1,5 @@
 * {
-  font-family: Helvetica, Arial, "PingFang SC", "Noto Sans", Roboto, "Microsoft Yahei", sans;
+  font-family:'Hiragino Sans GB', Helvetica, Arial, 'STHeiti', 'WenQuanYi Micro Hei', sans-serif
 }
 
 .searchTxt {
@@ -89,4 +89,14 @@
 
 .loading-list {
   margin-top: 50px
+}
+
+kbd {
+  background-color: #000;
+  color: #FFF;
+  background-color: #000;
+  color: #FFF;
+  font-size: 15px;
+  padding: 5px 10px;
+  border-radius: 4px;
 }
