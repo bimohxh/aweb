@@ -21,8 +21,10 @@ $(function () {
         } else {
           listSearch()
         }
-      },
-      keyChange () {
+      }
+    },
+    watch: {
+      keyword: function () {
         if (APP.keyword[0] === ':') {
           var func = keymap[APP.keyword.substring(1)]
           if (typeof func === 'function') {
@@ -34,6 +36,7 @@ $(function () {
       }
     }
   })
+
 
   listLatest()
 })
@@ -52,7 +55,7 @@ function listLatest () {
   
   $.get(baseUrl + 'api/latest', {}, function(data) {
     data.items.forEach(function(item) {
-      item.fresh = freshData(item.pushed_at)
+       processRepo(item)
     })
     if (!storeList) {
       APP.repos = data.items
@@ -72,7 +75,7 @@ function listSearch () {
   APP.isring = true
   $.get(baseUrl + 'api/search?q=' + APP.keyword, {}, function(data) {
     data.items.forEach(function(item) {
-      item.fresh = freshData(item.pushed_at)
+       processRepo(item)
     })
     APP.repos = data.items
     APP.isring = false
@@ -87,7 +90,7 @@ function listTop () {
   APP.isring = true
   $.get(baseUrl + 'api/top', {}, function(data) {
     data.items.forEach(function(item) {
-      item.fresh = freshData(item.pushed_at)
+      processRepo(item)
     })
     APP.repos = data.items
     APP.isring = false
@@ -110,8 +113,16 @@ function listSubject () {
  */
 
 
-// 获取更新频率
-function freshData(time) {
+/**
+ * 处理框架列表的每一项
+ */
+function processRepo (item) {
+  item.fresh = freshData(item.pushed_at)
+  item.trend = trendData(item.trend)
+}
+
+// 计算更新频率
+function freshData (time) {
   var diff = (Date.now() - Date.parse(time)) / 3600000
   if (diff > 60) {
     return ['outdated', '过期']
@@ -124,3 +135,22 @@ function freshData(time) {
 
   return ['normal', '正常']
 }
+
+
+// 计算趋势
+function trendData (trend) {
+  if(trend >= 60) {
+    return 3
+  }
+
+  if(trend >= 30) {
+    return 2
+  }
+
+  if(trend > 0) {
+    return 1
+  }
+
+  return 0
+}
+

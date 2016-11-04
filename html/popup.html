@@ -15,13 +15,39 @@
           <span class="fresh {{item.fresh[0]}}" title="{{item.fresh[1]}}"></span>
           <h3>{{item.name}}</h3> 
           <div class="desc">{{item.description_cn}}</div>
-          <p>
-            <span class="category">{{item.typcd_zh}}</span>
-            <svg aria-hidden="true" class="octicon octicon-star" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74z"></path></svg>
-
-            <span>{{item.stargazers_count}} </span>
-          </p>
+          
         </div>
+
+        <ul class="repo-extra">
+          <li  title="趋势">
+            <svg class="icon">
+                <use xlink:href="/css/icon.svg#rank-{{item.trend}}"></use>
+            </svg>
+            <span class="category">{{item.typcd_zh}}</span>
+          </li>
+          <li  title="在用">
+              <svg class="icon icon-flip-horizontal" >
+                  <use xlink:href="/css/icon.svg#hand-lizard-o"></use>
+              </svg>
+              <span>{{item.using}} </span>
+            </li>  
+          <li  title="Issue响应速度">
+              <svg class="icon">
+                  <use xlink:href="/css/icon.svg#issue"></use>
+              </svg>
+              <span>{{item.issue_friendly}} </span>
+            </li>
+          <li  title="Star数">
+              <svg class="icon">
+                  <use xlink:href="/css/icon.svg#favor"></use>
+              </svg>
+              <span>{{item.stargazers_count}} </span>
+            </li>
+            
+            
+            
+          </ul>
+
         
       </div>
 

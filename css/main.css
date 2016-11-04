@@ -36,6 +36,7 @@
 
 .repo-item .innner {
   padding-left: 60px;
+  height: 50px;
 }
 
 .repo-item .cover {
@@ -47,25 +48,41 @@
 }
 
 .repo-item h3 {
-  margin: 2px 0;
-  margin-bottom: 0;
-
+  margin-top: 2px;
+  margin-bottom: 7px;
   font-size: 17px
 }
 
 .repo-item .desc {
-  color: #a2a2a2;
+  color: #3a3a3a;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 }
 
-.repo-item .category {
-  color: #444;
-  background-color: #EEE;
-  padding: 5px 10px;
-  border-radius: 2px;
-  font-size: 12px;
+.repo-extra {
+  color: #767676;
+  margin: 0;
+  padding: 0;
+  margin-top: 10px;
+}
+.repo-extra li {
+  list-style: none;
+  display: inline-block;
+  margin-right: 7px;
+}
+.repo-extra li * {
+  float: left;
+  display: inline-block
+}
+.repo-extra li span {
+  margin-top: 2px
+}
+
+.repo-extra svg {
+  fill: #767676;
+  float: left;
+  margin-right: 3px;
 }
 
 .fresh {
@@ -99,4 +116,22 @@ kbd {
   font-size: 15px;
   padding: 5px 10px;
   border-radius: 4px;
+}
+
+.sub-item {
+  text-align: center;
+  border-bottom: #DDD 1px solid
+}
+
+
+.icon {
+  width: 15px; 
+  height: 15px;
+}
+
+.icon-flip-horizontal {
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1);
+    -webkit-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+    transform: scale(-1, 1);
 }
