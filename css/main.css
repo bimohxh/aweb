@@ -120,6 +120,7 @@ kbd {
 
 .sub-item {
   text-align: center;
+<<<<<<< HEAD
   border-bottom: #DDD 1px solid
 }
 
@@ -134,4 +135,7 @@ kbd {
     -webkit-transform: scale(-1, 1);
     -ms-transform: scale(-1, 1);
     transform: scale(-1, 1);
+=======
+  border-bottom: #DDD 1px solid;
+>>>>>>> tmp
 }
