@@ -89,12 +89,25 @@ function init () {
  */
 function listLatest () {
   APP.view = 'repos'
-  var storeList = store.get('latestrepos')
+  /*var storeList = store.get('latestrepos')
   if (storeList) {
     APP.repos = storeList
   } else {
     APP.isring = true
   }
+*/
+  storeWithExpire('awe:latestrepos', function () {
+    $.get(baseUrl + 'api/latest', {}, function(data) {
+      data.items.forEach(function(item) {
+        processRepo(item)
+      })
+      /*if (!storeList) {
+        APP.repos = data.items
+        APP.isring = false
+      }*/
+      //store.set('latestrepos', data.items)
+    })
+  })
   
   $.get(baseUrl + 'api/latest', {}, function(data) {
     data.items.forEach(function(item) {
@@ -219,4 +232,30 @@ function trendData (trend) {
   return 0
 }
 
+// 缓存
+function storeWithExpire (key, queryFunc, exp) {
+  exp = exp || 1
+  var result = cacheStore.get(key)
+  if(!result) {
+    queryFunc(function(val) {
+      cacheStore.set(key, val, exp)
+    })
+  }
+}
 
+
+// 缓存策略
+var cacheStore = {
+  set: function(key, val, exp) {
+    store.set(key, { val:val, exp: exp, time: new Date().getTime() })
+  },
+  get: function(key) {
+    var info = store.get(key)
+    if (!info) { return null }
+    if ((new Date().getTime() - info.time)  / 1000 / 3600 / 24 > info.exp) { 
+      store.remove(key)
+      return null 
+    }
+    return info.val
+  }
+}
