@@ -2,6 +2,11 @@
   font-family:'Hiragino Sans GB', Helvetica, Arial, 'STHeiti', 'WenQuanYi Micro Hei', sans-serif
 }
 
+a {
+  color: #333;
+  text-decoration: none;
+}
+
 .searchTxt {
   width: 480px;
   padding: 10px;
@@ -104,6 +109,14 @@
   background-color: #FFBCBC;
 }
 
+.rank {
+  display: inline-block;
+  position: absolute;
+  right: 5px;
+  top: 30px;
+  font-size: 15px;
+}
+
 .loading-list {
   margin-top: 50px
 }
@@ -120,10 +133,48 @@ kbd {
 
 .sub-item {
   text-align: center;
-<<<<<<< HEAD
   border-bottom: #DDD 1px solid
 }
 
+.add-wraper {
+  font-size: 15px;
+  padding: 50px;
+  text-align: center;
+}
+
+.add-wraper button {
+  margin-top: 20px;
+  padding: 10px 30px;
+  background-color: #272626;
+  border: 0;
+  color: #FFF;
+ }
+
+.add-wraper .alert {
+  margin-top: 30px
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.help-wraper li{
+  margin: 20px 0;
+  list-style: none
+}
+.help-wraper ul {
+  padding: 0 10px ;
+}
 
 .icon {
   width: 15px; 
@@ -135,7 +186,4 @@ kbd {
     -webkit-transform: scale(-1, 1);
     -ms-transform: scale(-1, 1);
     transform: scale(-1, 1);
-=======
-  border-bottom: #DDD 1px solid;
->>>>>>> tmp
 }

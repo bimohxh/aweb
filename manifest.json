@@ -5,6 +5,8 @@
   "description": "Front web framework search engine",
   "version": "1.0",
 
+  "default_locale": "en",
+
   "permissions": [
     "tabs",
     "notifications",

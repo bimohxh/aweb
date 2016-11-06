@@ -2,7 +2,8 @@ var APP;
 var baseUrl = 'http://192.168.141.128:3000/'
 var keymap = {
   'top': listTop,
-  's': listSubject
+  's': listSubject,
+  '+': showAddNewRepo
 }
 $(function () {
   APP = new Vue({
@@ -11,7 +12,10 @@ $(function () {
       repos: [],
       subs: [],
       isring: false,
-      view: 'help'
+      view: 'repos',
+      categorys: [],
+      current_url: undefined,
+      addstatus: 'ready'
     },
     methods: {
       submit () {
@@ -21,7 +25,17 @@ $(function () {
         } else {
           listSearch()
         }
+      },
+      addNewRepo: function () {
+        chrome.tabs.create()
+        return 
+        if(!APP.current_url) { return }
+        var typs = APP.category.split('-')
+        $.post(baseUrl + 'api/newrepo', {url: APP.current_url, rootyp: typs[0], typcd: typs[1]}, function (data) {
+          APP.addstatus = 'success'
+        })
       }
+
     },
     watch: {
       keyword: function () {
@@ -34,12 +48,31 @@ $(function () {
           }
         }
       }
+    },
+    computed: {
+      isListRepos: function () {
+        return ['repos', 'tops'].indexOf(APP.view) > -1
+      }
     }
   })
 
+  init()
 
   listLatest()
 })
+
+
+/**
+**/
+function init () {
+  getCurrentTabUrl(function (url) {
+    url = /^https:\/\/github.com\/[^\/]+\/[^\/]+/.exec(url)
+    if(url) {
+      APP.current_url = url[0]
+    }
+  })
+}
+
 
 /**
  * 获取最新的框架
@@ -55,14 +88,13 @@ function listLatest () {
   
   $.get(baseUrl + 'api/latest', {}, function(data) {
     data.items.forEach(function(item) {
-       processRepo(item)
+      processRepo(item)
     })
     if (!storeList) {
       APP.repos = data.items
       APP.isring = false
     }
     store.set('latestrepos', data.items)
-    
   })
 }
 
@@ -86,7 +118,7 @@ function listSearch () {
  * 获取前端top 100
  */
 function listTop () {
-  APP.view = 'repos'
+  APP.view = 'tops'
   APP.isring = true
   $.get(baseUrl + 'api/top', {}, function(data) {
     data.items.forEach(function(item) {
@@ -108,9 +140,32 @@ function listSubject () {
     APP.isring = false
   })
 }
+
+
 /**
  * 获取专题详情
  */
+
+function showAddNewRepo () {
+  APP.view = 'add'
+  getAllTyps() 
+}
+
+
+// 获取分类
+function getAllTyps () {
+  var storeList = store.get('aweb-categorys')
+  if (storeList) {
+    APP.categorys = storeList
+    APP.category = storeList[0].key
+  }
+
+  $.get(baseUrl + 'api/categorys', {}, function (data) {
+    APP.categorys = data.items
+    APP.category = data.items[0].key
+    store.set('aweb-categorys', data.items)
+  })
+}
 
 
 /**
@@ -153,4 +208,5 @@ function trendData (trend) {
 
   return 0
 }
+
 
