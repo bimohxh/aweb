@@ -7,7 +7,7 @@
     
   </head>
   <body>
-    <input type="text" id="searchTxt" autofocus placeholder="Type keyowrd and press enter" class="searchTxt" @keyup="keyChange()" @keyup.13="submit()" v-model="keyword">
+    <input type="text" id="searchTxt" autofocus placeholder="Type keyowrd and press enter" class="searchTxt" @keyup="keyChange()" @keyup.13="searchGo()" v-model="keyword">
     <div class="list-wraper">
       <div class="repo-item" v-for="item in repos" v-show="isListRepos && !isring">
         <div class="innner">

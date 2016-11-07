@@ -1,3 +1,5 @@
 {
-  "searchTxt": "输入关键字并回车搜索"
+  "searchTxt": {
+     "message": "输入关键字并回车搜索"
+  }
 }

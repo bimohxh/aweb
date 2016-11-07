@@ -1,5 +1,5 @@
 var APP;
-var baseUrl = 'http://192.168.141.128:3000/'
+var baseUrl = 'https://www.awesomes.cn/'
 var keymap = {
   'top': listTop,
   's': listSubject,
@@ -9,6 +9,7 @@ $(function () {
   APP = new Vue({
     el: 'body',
     data: {
+      keyword: store.get('aweb-keyword'),
       repos: [],
       subs: [],
       isring: false,
@@ -18,17 +19,15 @@ $(function () {
       addstatus: 'ready'
     },
     methods: {
-      submit () {
-        var keyword = APP.keyword
-        if (keyword.trim() === '') {
-          listLatest()
-        } else {
-          listSearch()
+      searchGo () {
+        var keyword = APP.keyword.trim()
+        if (keyword === '' || keyword[0] === ':') {
+          return 
         }
+
+        listSearch()
       },
       addNewRepo: function () {
-        chrome.tabs.create()
-        return 
         if(!APP.current_url) { return }
         var typs = APP.category.split('-')
         $.post(baseUrl + 'api/newrepo', {url: APP.current_url, rootyp: typs[0], typcd: typs[1]}, function (data) {
@@ -39,14 +38,7 @@ $(function () {
     },
     watch: {
       keyword: function () {
-        if (APP.keyword[0] === ':') {
-          var func = keymap[APP.keyword.substring(1)]
-          if (typeof func === 'function') {
-            func()
-          } else {
-            APP.view = 'help'
-          }
-        }
+        changeKeyword()
       }
     },
     computed: {
@@ -58,8 +50,26 @@ $(function () {
 
   init()
 
-  listLatest()
+  changeKeyword()
 })
+
+
+function changeKeyword() {
+  APP.keyword = APP.keyword.trim()
+  store.set('aweb-keyword', APP.keyword)
+  if (APP.keyword === '') {
+    listLatest()
+  }
+
+  if (APP.keyword[0] === ':') {
+    var func = keymap[APP.keyword.substring(1)]
+    if (typeof func === 'function') {
+      func()
+    } else {
+      APP.view = 'help'
+    }
+  }
+}
 
 
 /**
@@ -183,7 +193,7 @@ function freshData (time) {
     return ['outdated', '过期']
   }
 
-  if (_val < 7) {
+  if (diff < 7) {
     return ['often', '频繁']
   }
   
