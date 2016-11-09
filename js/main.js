@@ -3,7 +3,8 @@ var baseUrl = 'https://www.awesomes.cn/'
 var keymap = {
   'top': listTop,
   's': listSubject,
-  '+': showAddNewRepo
+  '+': showAddNewRepo,
+  'clear': clearCache
 }
 $(function () {
   APP = new Vue({
@@ -22,6 +23,7 @@ $(function () {
       searchGo () {
         var keyword = APP.keyword.trim()
         if (keyword === '' || keyword[0] === ':') {
+          changeKeyword()
           return 
         }
 
@@ -48,9 +50,7 @@ $(function () {
     }
   })
 
-  init()
-
-  changeKeyword()
+  init() 
 })
 
 
@@ -81,6 +81,8 @@ function init () {
       APP.current_url = url[0]
     }
   })
+
+  APP.searchGo()
 }
 
 
@@ -89,22 +91,17 @@ function init () {
  */
 function listLatest () {
   APP.view = 'repos'
-  var storeList = store.get('latestrepos')
-  if (storeList) {
-    APP.repos = storeList
-  } else {
+  cacheStoreFunc('awe-latestrepos', 0.5, function(callback) {
     APP.isring = true
-  }
-  
-  $.get(baseUrl + 'api/latest', {}, function(data) {
-    data.items.forEach(function(item) {
-      processRepo(item)
+    $.get(baseUrl + 'api/latest', {}, function(data) {
+      data.items.forEach(function(item) {
+        processRepo(item)
+      })
+      callback(data.items)
     })
-    if (!storeList) {
-      APP.repos = data.items
-      APP.isring = false
-    }
-    store.set('latestrepos', data.items)
+  }, function (data) {
+    APP.repos = data
+    APP.isring = false
   })
 }
 
@@ -114,12 +111,17 @@ function listLatest () {
  */
 function listSearch () {
   APP.view = 'repos'
-  APP.isring = true
-  $.get(baseUrl + 'api/search?q=' + APP.keyword, {}, function(data) {
-    data.items.forEach(function(item) {
-       processRepo(item)
+
+  cacheStoreFunc('awe-search-' +  APP.keyword, 1, function(callback) {
+    APP.isring = true
+    $.get(baseUrl + 'api/search?q=' + APP.keyword, {}, function(data) {
+      data.items.forEach(function(item) {
+        processRepo(item)
+      })
+      callback(data.items)
     })
-    APP.repos = data.items
+  }, function (data) {
+    APP.repos = data
     APP.isring = false
   })
 }
@@ -129,12 +131,16 @@ function listSearch () {
  */
 function listTop () {
   APP.view = 'tops'
-  APP.isring = true
-  $.get(baseUrl + 'api/top', {}, function(data) {
-    data.items.forEach(function(item) {
-      processRepo(item)
+  cacheStoreFunc('awe-tops', 0.5, function(callback) {
+    APP.isring = true
+    $.get(baseUrl + 'api/top', {}, function(data) {
+      data.items.forEach(function(item) {
+        processRepo(item)
+      })
+      callback(data.items)
     })
-    APP.repos = data.items
+  }, function (data) {
+    APP.repos = data
     APP.isring = false
   })
 }
@@ -144,16 +150,23 @@ function listTop () {
  */
 function listSubject () {
   APP.view = 'subject'
-  APP.isring = true
-  $.get(baseUrl + 'api/subjects', {}, function(data) {
-    APP.subs = data.items
+  cacheStoreFunc('awe-subjects', 1, function(callback) {
+    APP.isring = true
+    $.get(baseUrl + 'api/subjects', {}, function(data) {
+      data.items.forEach(function(item) {
+        processRepo(item)
+      })
+      callback(data.items)
+    })
+  }, function (data) {
+    APP.subs = data
     APP.isring = false
   })
 }
 
 
 /**
- * 获取专题详情
+ * 提交库
  */
 
 function showAddNewRepo () {
@@ -164,19 +177,25 @@ function showAddNewRepo () {
 
 // 获取分类
 function getAllTyps () {
-  var storeList = store.get('aweb-categorys')
-  if (storeList) {
-    APP.categorys = storeList
-    APP.category = storeList[0].key
-  }
-
-  $.get(baseUrl + 'api/categorys', {}, function (data) {
-    APP.categorys = data.items
-    APP.category = data.items[0].key
-    store.set('aweb-categorys', data.items)
+  cacheStoreFunc('awe-categorys', 3, function(callback) {
+    $.get(baseUrl + 'api/categorys', {}, function(data) {
+      callback(data.items)
+    })
+  }, function (data) {
+    APP.categorys = data
+    APP.category = data[0].key
   })
 }
 
+
+/**
+ * 清空缓存
+ */
+function clearCache () {
+  ['awe-categorys', 'awe-latestrepos', 'awe-tops', 'awe-subjects'].forEach(function(key) {
+    store.remove(key)
+  })
+}
 
 /**
  * 处理框架列表的每一项
@@ -188,7 +207,7 @@ function processRepo (item) {
 
 // 计算更新频率
 function freshData (time) {
-  var diff = (Date.now() - Date.parse(time)) / 3600000
+  var diff = (Date.now() - Date.parse(time)) / (3600000 * 24)
   if (diff > 60) {
     return ['outdated', '过期']
   }
@@ -220,3 +239,35 @@ function trendData (trend) {
 }
 
 
+/**
+ * 缓存策略
+ */
+
+function cacheStoreFunc (key, exp, func, callback) {
+  var old = cacheStore.get(key)
+  if(!old) {
+    func(function(data) {
+      cacheStore.set(key, data, exp)
+      callback(data)
+    })
+  } else {
+    callback(old)
+  }
+}
+
+
+var cacheStore = {
+    set: function(key, val, exp) {
+        exp = exp * 24 * 3600 * 1000
+        store.set(key, { val:val, exp: exp, time:new Date().getTime() })
+    },
+    get: function(key) {
+        var info = store.get(key)
+        if (!info) { return null }
+        if (new Date().getTime() - info.time > info.exp) {
+          store.remove(key)
+          return null
+        }
+        return info.val
+    }
+}
