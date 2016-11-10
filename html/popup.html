@@ -7,9 +7,9 @@
     
   </head>
   <body>
-    <input type="text" id="searchTxt" autofocus placeholder="Type keyowrd and press enter" class="searchTxt" @keyup="keyChange()" @keyup.13="searchGo()" v-model="keyword">
+    <input type="text" id="searchTxt" autofocus placeholder="Keyword + Enter or type `:`" class="searchTxt" @keyup="keyChange()" @keyup.13="searchGo()" v-model="keyword">
     <div class="list-wraper">
-      <div class="repo-item" v-for="item in repos" v-show="isListRepos && !isring">
+      <div class="repo-item" v-for="item in repos" :key="item.id" v-show="isListRepos && !isring">
         <div class="innner">
           <a href="https://www.awesomes.cn{{item.link_url}}" target="_blank">
             <img class="cover" src="{{item.cover_path}}@1e_50w_50h_1c_0i_1o_1x.png" />

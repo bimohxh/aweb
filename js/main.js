@@ -1,5 +1,5 @@
 var APP;
-var baseUrl = 'https://www.awesomes.cn/'
+var baseUrl = 'http://192.168.26.128:2000/'
 var keymap = {
   'top': listTop,
   's': listSubject,
@@ -10,14 +10,18 @@ $(function () {
   APP = new Vue({
     el: 'body',
     data: {
-      keyword: store.get('aweb-keyword'),
+      keyword: store.get('aweb-keyword'), 
       repos: [],
+      subrepos: [],
       subs: [],
       isring: false,
       view: 'repos',
       categorys: [],
       current_url: undefined,
-      addstatus: 'ready'
+      addstatus: 'ready',
+      i18: {
+         search_txt: chrome.i18n.getMessage('search_txt')
+      }
     },
     methods: {
       searchGo () {
@@ -45,7 +49,7 @@ $(function () {
     },
     computed: {
       isListRepos: function () {
-        return ['repos', 'tops'].indexOf(APP.view) > -1
+        return ['repos', 'tops', 'subrepos'].indexOf(APP.view) > -1
       }
     }
   })
@@ -62,9 +66,10 @@ function changeKeyword() {
   }
 
   if (APP.keyword[0] === ':') {
-    var func = keymap[APP.keyword.substring(1)]
+    var cmds = APP.keyword.split(':')
+    var func = keymap[cmds[1]]
     if (typeof func === 'function') {
-      func()
+      func(cmds[2])
     } else {
       APP.view = 'help'
     }
@@ -148,8 +153,11 @@ function listTop () {
 /**
  * 获取专题列表
  */
-function listSubject () {
-  APP.view = 'subject'
+
+function listAboutSubject (subject) {
+  
+}
+function listSubject (subject) {
   cacheStoreFunc('awe-subjects', 1, function(callback) {
     APP.isring = true
     $.get(baseUrl + 'api/subjects', {}, function(data) {
@@ -160,6 +168,39 @@ function listSubject () {
     })
   }, function (data) {
     APP.subs = data
+    APP.isring = false
+
+    if (subject) {
+      var mps = APP.subs.filter(function (item) {
+        return item.key.toLowerCase().indexOf(subject) === 0
+      })
+
+      if (APP.subs.length === 0 || mps.length === 1) {
+        listSubjectRepos(mps[0].key)
+        return
+      }
+    } else {
+      APP.view = 'subject'
+    }
+  })
+}
+
+
+/**
+ * 获取某个主题的所有库
+ */
+
+function listSubjectRepos (subject) {
+  console.log('===', subject)
+  APP.view = 'subrepos'
+  cacheStoreFunc('awe-subrepo-' + subject, 1, function(callback) {
+    APP.isring = true
+    $.get(baseUrl + 'api/subrepos', {key: subject}, function(data) {
+      data.items = processSubRepos(data.items)
+      callback(data.items)
+    })
+  }, function (data) {
+    APP.subrepos = data
     APP.isring = false
   })
 }
@@ -205,6 +246,31 @@ function processRepo (item) {
   item.trend = trendData(item.trend)
 }
 
+/**
+ * 处理专题下面的框架
+ */
+
+function processSubRepos (items) {
+  var subjects = []
+  items.forEach(function (item) {
+    processRepo(item)
+    var key = item.rootyp + '-' + item.typcd
+    var subject = subjects.find(function (item) {
+      return item.key === key
+    })
+    if (subject) {
+      subject.repos.push(item)
+    } else {
+      subjects.push({
+        key: key,
+        repos: [item]
+      })
+    }
+  })
+  return items
+}
+
+
 // 计算更新频率
 function freshData (time) {
   var diff = (Date.now() - Date.parse(time)) / (3600000 * 24)
@@ -245,7 +311,8 @@ function trendData (trend) {
 
 function cacheStoreFunc (key, exp, func, callback) {
   var old = cacheStore.get(key)
-  if(!old) {
+  //if(!old) {
+  if(true) {
     func(function(data) {
       cacheStore.set(key, data, exp)
       callback(data)
