@@ -1,27 +1,32 @@
 var APP;
-var baseUrl = 'https://www.awesomes.cn/'
+var baseUrl = 'http://192.168.141.128:3000/'
 var keymap = {
   'top': listTop,
   's': listSubject,
-  '+': showAddNewRepo
+  '+': showAddNewRepo,
+  'clear': clearCache
 }
 $(function () {
   APP = new Vue({
     el: 'body',
     data: {
-      keyword: store.get('aweb-keyword'),
+      keyword: store.get('aweb-keyword'), 
       repos: [],
       subs: [],
       isring: false,
       view: 'repos',
       categorys: [],
       current_url: undefined,
-      addstatus: 'ready'
+      addstatus: 'ready',
+      i18: {
+         search_txt: chrome.i18n.getMessage('search_txt')
+      }
     },
     methods: {
       searchGo () {
         var keyword = APP.keyword.trim()
         if (keyword === '' || keyword[0] === ':') {
+          changeKeyword()
           return 
         }
 
@@ -43,14 +48,12 @@ $(function () {
     },
     computed: {
       isListRepos: function () {
-        return ['repos', 'tops'].indexOf(APP.view) > -1
+        return ['repos', 'tops', 'subrepos'].indexOf(APP.view) > -1
       }
     }
   })
 
-  init()
-
-  changeKeyword()
+  init() 
 })
 
 
@@ -62,9 +65,10 @@ function changeKeyword() {
   }
 
   if (APP.keyword[0] === ':') {
-    var func = keymap[APP.keyword.substring(1)]
+    var cmds = APP.keyword.split(':')
+    var func = keymap[cmds[1]]
     if (typeof func === 'function') {
-      func()
+      func(cmds[2])
     } else {
       APP.view = 'help'
     }
@@ -81,6 +85,8 @@ function init () {
       APP.current_url = url[0]
     }
   })
+
+  APP.searchGo()
 }
 
 
@@ -89,35 +95,14 @@ function init () {
  */
 function listLatest () {
   APP.view = 'repos'
-  /*var storeList = store.get('latestrepos')
-  if (storeList) {
-    APP.repos = storeList
-  } else {
+  cacheStoreFunc('awe-latestrepos', 0.5, function(callback) {
     APP.isring = true
-  }
-*/
-  storeWithExpire('awe:latestrepos', function () {
     $.get(baseUrl + 'api/latest', {}, function(data) {
-      data.items.forEach(function(item) {
-        processRepo(item)
-      })
-      /*if (!storeList) {
-        APP.repos = data.items
-        APP.isring = false
-      }*/
-      //store.set('latestrepos', data.items)
+      callback(data.items)
     })
-  })
-  
-  $.get(baseUrl + 'api/latest', {}, function(data) {
-    data.items.forEach(function(item) {
-      processRepo(item)
-    })
-    if (!storeList) {
-      APP.repos = data.items
-      APP.isring = false
-    }
-    store.set('latestrepos', data.items)
+  }, function (data) {
+    APP.repos = groupRepos(data)
+    APP.isring = false
   })
 }
 
@@ -127,12 +112,13 @@ function listLatest () {
  */
 function listSearch () {
   APP.view = 'repos'
-  APP.isring = true
-  $.get(baseUrl + 'api/search?q=' + APP.keyword, {}, function(data) {
-    data.items.forEach(function(item) {
-       processRepo(item)
+  cacheStoreFunc('awe-search-' +  APP.keyword, 1, function(callback) {
+    APP.isring = true
+    $.get(baseUrl + 'api/search?q=' + APP.keyword, {}, function(data) {
+      callback(data.items)
     })
-    APP.repos = data.items
+  }, function (data) {
+    APP.repos = groupRepos(data)
     APP.isring = false
   })
 }
@@ -142,12 +128,13 @@ function listSearch () {
  */
 function listTop () {
   APP.view = 'tops'
-  APP.isring = true
-  $.get(baseUrl + 'api/top', {}, function(data) {
-    data.items.forEach(function(item) {
-      processRepo(item)
+  cacheStoreFunc('awe-tops', 0.5, function(callback) {
+    APP.isring = true
+    $.get(baseUrl + 'api/top', {}, function(data) {
+      callback(data.items)
     })
-    APP.repos = data.items
+  }, function (data) {
+    APP.repos = groupRepos(data)
     APP.isring = false
   })
 }
@@ -155,18 +142,97 @@ function listTop () {
 /**
  * 获取专题列表
  */
-function listSubject () {
-  APP.view = 'subject'
-  APP.isring = true
-  $.get(baseUrl + 'api/subjects', {}, function(data) {
-    APP.subs = data.items
+
+
+function listSubject (subject) {
+  cacheStoreFunc('awe-subjects', 1, function(callback) {
+    APP.isring = true
+    $.get(baseUrl + 'api/subjects', {}, function(data) {
+      data.items.forEach(function(item) {
+        processRepo(item)
+      })
+      callback(data.items)
+    })
+  }, function (data) {
+    APP.subs = data
     APP.isring = false
+
+    if (subject) {
+      var mps = APP.subs.filter(function (item) {
+        return item.key.toLowerCase().indexOf(subject) === 0
+      })
+
+      if (APP.subs.length === 0 || mps.length === 1) {
+        listSubjectRepos(mps[0].key)
+        return
+      }
+    } else {
+      APP.view = 'subject'
+    }
   })
 }
 
 
 /**
- * 获取专题详情
+ * 获取某个主题的所有库
+ */
+
+function listSubjectRepos (subject) {
+  APP.view = 'repos'
+  cacheStoreFunc('awe-subrepo-' + subject, 1, function(callback) {
+    APP.isring = true
+    $.get(baseUrl + 'api/subrepos', {key: subject}, function(data) {
+      data.items = processSubRepos(data.items)
+      callback(data.items)
+    })
+  }, function (data) {
+    APP.repos = groupSubjectRepos(data)
+    APP.isring = false
+  })
+}
+
+// 专题下的库归类
+function groupSubjectRepos (items) {
+  return items.reduce(function (result, item) {
+    var key = item.rootyp + '-' + item.typcd
+    var old = result.find(function(sub) {
+      return sub.key === key
+    })
+
+    if (old) {
+      old.items.push(item)
+    } else {
+      result.push({
+        key: key,
+        items: [item]
+      })
+    }
+
+    return result
+
+  }, [])
+}
+
+
+// 普通库的归类
+function groupRepos (items) {
+  items.forEach(function(item) {
+    processRepo(item)
+  })
+
+  return [
+    {
+      key: 'normal',
+      items: items
+    }
+  ]
+}
+
+
+
+
+/**
+ * 提交库
  */
 
 function showAddNewRepo () {
@@ -177,19 +243,25 @@ function showAddNewRepo () {
 
 // 获取分类
 function getAllTyps () {
-  var storeList = store.get('aweb-categorys')
-  if (storeList) {
-    APP.categorys = storeList
-    APP.category = storeList[0].key
-  }
-
-  $.get(baseUrl + 'api/categorys', {}, function (data) {
-    APP.categorys = data.items
-    APP.category = data.items[0].key
-    store.set('aweb-categorys', data.items)
+  cacheStoreFunc('awe-categorys', 3, function(callback) {
+    $.get(baseUrl + 'api/categorys', {}, function(data) {
+      callback(data.items)
+    })
+  }, function (data) {
+    APP.categorys = data
+    APP.category = data[0].key
   })
 }
 
+
+/**
+ * 清空缓存
+ */
+function clearCache () {
+  ['awe-categorys', 'awe-latestrepos', 'awe-tops', 'awe-subjects'].forEach(function(key) {
+    store.remove(key)
+  })
+}
 
 /**
  * 处理框架列表的每一项
@@ -199,9 +271,34 @@ function processRepo (item) {
   item.trend = trendData(item.trend)
 }
 
+/**
+ * 处理专题下面的框架
+ */
+
+function processSubRepos (items) {
+  var subjects = []
+  items.forEach(function (item) {
+    processRepo(item)
+    var key = item.rootyp + '-' + item.typcd
+    var subject = subjects.find(function (item) {
+      return item.key === key
+    })
+    if (subject) {
+      subject.repos.push(item)
+    } else {
+      subjects.push({
+        key: key,
+        repos: [item]
+      })
+    }
+  })
+  return items
+}
+
+
 // 计算更新频率
 function freshData (time) {
-  var diff = (Date.now() - Date.parse(time)) / 3600000
+  var diff = (Date.now() - Date.parse(time)) / (3600000 * 24)
   if (diff > 60) {
     return ['outdated', '过期']
   }
@@ -232,30 +329,37 @@ function trendData (trend) {
   return 0
 }
 
-// 缓存
-function storeWithExpire (key, queryFunc, exp) {
-  exp = exp || 1
-  var result = cacheStore.get(key)
-  if(!result) {
-    queryFunc(function(val) {
-      cacheStore.set(key, val, exp)
+
+/**
+ * 缓存策略
+ */
+
+function cacheStoreFunc (key, exp, func, callback) {
+  var old = cacheStore.get(key)
+  if(!old) {
+  //if(true) {
+    func(function(data) {
+      cacheStore.set(key, data, exp)
+      callback(data)
     })
+  } else {
+    callback(old)
   }
 }
 
 
-// 缓存策略
 var cacheStore = {
-  set: function(key, val, exp) {
-    store.set(key, { val:val, exp: exp, time: new Date().getTime() })
-  },
-  get: function(key) {
-    var info = store.get(key)
-    if (!info) { return null }
-    if ((new Date().getTime() - info.time)  / 1000 / 3600 / 24 > info.exp) { 
-      store.remove(key)
-      return null 
+    set: function(key, val, exp) {
+        exp = exp * 24 * 3600 * 1000
+        store.set(key, { val:val, exp: exp, time:new Date().getTime() })
+    },
+    get: function(key) {
+        var info = store.get(key)
+        if (!info) { return null }
+        if (new Date().getTime() - info.time > info.exp) {
+          store.remove(key)
+          return null
+        }
+        return info.val
     }
-    return info.val
-  }
 }

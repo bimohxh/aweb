@@ -1,6 +1,5 @@
 {
-  "searchTxt": {
-    "message": "Type keyowrd and press enter",
-    "description": "hello"
+  "search_txt": {
+    "message": "Type keyowrd and press enter"
   }
 }

@@ -7,49 +7,52 @@
     
   </head>
   <body>
-    <input type="text" id="searchTxt" autofocus placeholder="Type keyowrd and press enter" class="searchTxt" @keyup="keyChange()" @keyup.13="searchGo()" v-model="keyword">
+    <input type="text" id="searchTxt" autofocus placeholder="Keyword + Enter or type `:`" class="searchTxt" @keyup="keyChange()" @keyup.13="searchGo()" v-model="keyword">
     <div class="list-wraper">
-      <div class="repo-item" v-for="item in repos" v-show="isListRepos && !isring">
-        <div class="innner">
-          <a href="https://www.awesomes.cn{{item.link_url}}" target="_blank">
-            <img class="cover" src="{{item.cover_path}}@1e_50w_50h_1c_0i_1o_1x.png" />
-          </a>
-          <span class="fresh {{item.fresh[0]}}" title="{{item.fresh[1]}}" v-show="view == 'repos'"></span>
-          <i class="rank" v-show="view == 'tops'">{{$index + 1}}</i>
-          <a href="https://www.awesomes.cn{{item.link_url}}" target="_blank">
-            <h3>{{item.name}}</h3> 
-          </a>
-          <div class="desc">{{item.description_cn}}</div>
-          
-        </div>
+      <div v-for="group in repos">
+        <div class="subtyp" v-show="repos.length > 1">{{group.items[0].rootyp_zh}} - {{group.items[0].typcd_zh}}</div>
+        <div class="repo-item" v-for="item in group.items" :key="item.id" v-show="isListRepos && !isring">
+          <div class="innner">
+            <a href="https://www.awesomes.cn{{item.link_url}}" target="_blank">
+              <img class="cover" src="{{item.cover_path}}@1e_50w_50h_1c_0i_1o_1x.png" />
+            </a>
+            <span class="fresh {{item.fresh[0]}}" title="{{item.fresh[1]}}" v-show="view == 'repos'"></span>
+            <i class="rank" v-show="view == 'tops'">{{$index + 1}}</i>
+            <a href="https://www.awesomes.cn{{item.link_url}}" target="_blank">
+              <h3>{{item.name}}</h3> 
+            </a>
+            <div class="desc">{{item.description_cn}}</div>
+            
+          </div>
 
-        <ul class="repo-extra">
-          <li  title="趋势">
-            <svg class="icon">
-                <use xlink:href="/css/icon.svg#rank-{{item.trend}}"></use>
-            </svg>
-            <span class="category">{{item.typcd_zh}}</span>
-          </li>
-          <li  title="在用">
-              <svg class="icon icon-flip-horizontal" >
-                  <use xlink:href="/css/icon.svg#hand-lizard-o"></use>
-              </svg>
-              <span>{{item.using}} </span>
-            </li>  
-          <li  title="Issue响应速度">
+          <ul class="repo-extra">
+            <li  title="趋势">
               <svg class="icon">
-                  <use xlink:href="/css/icon.svg#issue"></use>
+                  <use xlink:href="/css/icon.svg#rank-{{item.trend}}"></use>
               </svg>
-              <span>{{item.issue_friendly}} </span>
+              <span class="category">{{item.typcd_zh}}</span>
             </li>
-          <li  title="Star数">
-              <svg class="icon">
-                  <use xlink:href="/css/icon.svg#favor"></use>
-              </svg>
-              <span>{{item.stargazers_count}} </span>
-            </li>
-          </ul>
-      </div>
+            <li  title="在用">
+                <svg class="icon icon-flip-horizontal" >
+                    <use xlink:href="/css/icon.svg#hand-lizard-o"></use>
+                </svg>
+                <span>{{item.using}} </span>
+              </li>  
+            <li  title="Issue响应速度">
+                <svg class="icon">
+                    <use xlink:href="/css/icon.svg#issue"></use>
+                </svg>
+                <span>{{item.issue_friendly}} </span>
+              </li>
+            <li  title="Star数">
+                <svg class="icon">
+                    <use xlink:href="/css/icon.svg#favor"></use>
+                </svg>
+                <span>{{item.stargazers_count}} </span>
+              </li>
+            </ul>
+        </div>
+       </div>
 
       <! --加载动画 -->
       <div class="loading loading-list" v-show="isring">
@@ -63,7 +66,9 @@
       <! --专题列表 -->
       <div class="subject" v-show="view == 'subject'">
         <div class="sub-item" v-for="item in subs">
-          <h3>{{item.key}}</h3>
+          <a href="http://www.awesomes.cn/subject/{{item.key}}" target="_blank">
+            <h3 class="sub-key">{{item.key}}</h3>
+          </a>
         </div>
       </div>
 
