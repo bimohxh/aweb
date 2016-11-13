@@ -34,9 +34,11 @@ a {
   min-height: 60px;
   padding: 20px 0;
   padding-right: 30px;
-  border-bottom: #DDD 1px solid;
-  
-  
+  border-bottom: #DDD 1px solid; 
+}
+
+.repo-item:hover {
+  box-shadow: 0px 1px 10px #EEE;
 }
 
 .repo-item .innner {
@@ -98,7 +100,7 @@ a {
   height: 15px;
   position: absolute;
   right: 0;
-  top: 30px;
+  top: 50px;
 }
 
 .fresh.often {
@@ -142,11 +144,21 @@ kbd {
   font-size: 17px;
   background-color: #EEE;
   padding: 10px 0;
+  font-weight: bold;
+  color: #636363;
 }
 
 .sub-key {
   margin: 0;
   padding: 20px 0;
+}
+
+.no-items {
+  text-align: center;
+  padding: 100px 0;
+  font-size: 30px;
+  color: #eae9e9;
+  font-weight: bold;
 }
 
 .add-wraper {

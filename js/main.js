@@ -1,5 +1,5 @@
 var APP;
-var baseUrl = 'http://192.168.141.128:3000/'
+var baseUrl = 'https://www.awesomes.cn/'
 var keymap = {
   'top': listTop,
   's': listSubject,
@@ -19,7 +19,7 @@ $(function () {
       current_url: undefined,
       addstatus: 'ready',
       i18: {
-         search_txt: chrome.i18n.getMessage('search_txt')
+        search_txt: chrome.i18n.getMessage('search_txt')
       }
     },
     methods: {
@@ -48,7 +48,7 @@ $(function () {
     },
     computed: {
       isListRepos: function () {
-        return ['repos', 'tops', 'subrepos'].indexOf(APP.view) > -1
+        return ['repos', 'tops', 'subrepos'].indexOf(this.view) > -1
       }
     }
   })
