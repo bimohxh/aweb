@@ -78,19 +78,43 @@
 
       <! --添加repo -->
       <div v-show="view == 'add'" class="add-wraper">
+        <div  v-show="current_url && addstatus != 'success'">
+          <div class="add-left">
+            <template  v-for="item in categorys">
+              <div class="typ-head" > {{item.items[0].rootyp_zh}} </div>
+              <div class="typ-item checked-{{checkedtyp == typ.id}}" v-for="typ in item.items" @click="checkTyp(typ)">
+              <svg class="icon check-ico">
+                  <use xlink:href="/css/icon.svg#arrow"></use>
+                </svg>
+                {{ typ.typcd_zh }}
+              </div>
+            </template>
+          </div>
+          <div class="add-right">
+            <div>
+              <button type="button" @click="addNewRepo()" v-show="current_url && addstatus == 'ready'">提交当前库</button>
+            </div>
+          </div>
+        </div>
         
-        <p>提交当前库</p>
-        <p>{{current_url ? current_url : '当前URL的格式不满足要求'}}</p>
-        <select v-model="category">
-          <option v-for="typ in categorys" value="{{typ.key}}"> {{ typ.sdesc }} </option>
-        </select>
-
-        <div>
-          <button type="button" @click="addNewRepo()" v-show="current_url && addstatus == 'ready'">提交</button>
+        <div v-show="!current_url && addstatus != 'success'"  class="notvalid-url">
+          <svg>
+            <use xlink:href="/css/icon.svg#ban"></use>
+          </svg>
+          <p>当前URL格式不满足要求</p> 
+          <p>请前往正确的GitHub仓库地址</p> 
         </div>
 
-        <div class="alert alert-success" v-show="addstatus == 'success'">提交成功，感谢你的分享，我们将尽快审核</div>
+        <div v-show="addstatus == 'success'" class="submit-success">
+          <svg>
+            <use xlink:href="/css/icon.svg#success"></use>
+          </svg>
+          <p>感谢您的分享，我们会尽快审核</p>
+        </div>
+        
       </div>
+
+      
 
       <! --命令说明 -->
       <div v-show="view == 'help'" class="help-wraper">

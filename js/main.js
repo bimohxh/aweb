@@ -1,5 +1,6 @@
 var APP;
 var baseUrl = 'https://www.awesomes.cn/'
+//var baseUrl = 'http://192.168.141.128:3000/'
 var keymap = {
   'top': listTop,
   's': listSubject,
@@ -18,12 +19,13 @@ $(function () {
       categorys: [],
       current_url: undefined,
       addstatus: 'ready',
+      checkedtyp: 1,
       i18: {
         search_txt: chrome.i18n.getMessage('search_txt')
       }
     },
     methods: {
-      searchGo () {
+      searchGo: function () {
         var keyword = APP.keyword.trim()
         if (keyword === '' || keyword[0] === ':') {
           changeKeyword()
@@ -34,10 +36,12 @@ $(function () {
       },
       addNewRepo: function () {
         if(!APP.current_url) { return }
-        var typs = APP.category.split('-')
-        $.post(baseUrl + 'api/newrepo', {url: APP.current_url, rootyp: typs[0], typcd: typs[1]}, function (data) {
+        $.post(baseUrl + 'api/newrepo', {url: APP.current_url, typid: APP.checkedtyp}, function (data) {
           APP.addstatus = 'success'
         })
+      },
+      checkTyp: function (item) {
+        APP.checkedtyp = item.id
       }
 
     },
@@ -245,12 +249,32 @@ function showAddNewRepo () {
 function getAllTyps () {
   cacheStoreFunc('awe-categorys', 3, function(callback) {
     $.get(baseUrl + 'api/categorys', {}, function(data) {
-      callback(data.items)
+      callback(dealTypes(data.items))
     })
   }, function (data) {
     APP.categorys = data
-    APP.category = data[0].key
+    APP.checkedtyp = data[0].items[0].id
   })
+}
+
+// 处理分类数据
+function dealTypes (items) {
+  var cates = []
+  items.forEach(function (item) {
+    var old = cates.find(function (cate) {
+      return cate.key === item.rootyp
+    })
+
+    if (old) {
+      old.items.push(item)
+    } else {
+      cates.push({
+        key: item.rootyp,
+        items: [item]
+      })
+    }
+  })
+  return cates
 }
 
 
@@ -336,8 +360,8 @@ function trendData (trend) {
 
 function cacheStoreFunc (key, exp, func, callback) {
   var old = cacheStore.get(key)
-  if(!old) {
-  //if(true) {
+  //if(!old) {
+  if(true) {
     func(function(data) {
       cacheStore.set(key, data, exp)
       callback(data)

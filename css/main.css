@@ -161,22 +161,88 @@ kbd {
   font-weight: bold;
 }
 
+.notvalid-url {
+  color: #DDD;
+  font-size: 20px;
+}
+
+.notvalid-url svg{
+  width: 100px;
+  fill: #EEE;
+  margin-top: 50px;
+}
+
+.submit-success {
+  color: #71c150;
+  font-size: 20px;
+  
+}
+.submit-success svg
+{
+  margin-top: 40px;
+  width: 100px;
+  fill: #dff0d8;
+}
+
 .add-wraper {
   font-size: 15px;
-  padding: 50px;
   text-align: center;
 }
 
 .add-wraper button {
   margin-top: 20px;
-  padding: 10px 30px;
+  padding: 15px 30px;
   background-color: #272626;
   border: 0;
   color: #FFF;
+  cursor: pointer;
  }
 
 .add-wraper .alert {
   margin-top: 30px
+}
+
+.add-left {
+  width: 160px;
+  float: left;
+  height: 400px;
+  overflow-y: scroll;
+}
+.typ-head {
+  font-size: 16px;
+  font-weight: bold;
+  color: #DDD;
+  padding: 10px 0;
+  color: #14b9c7;
+  background-color: rgba(118, 118, 118, 0.06)
+}
+
+.typ-item {
+  border-top: #EEE 1px solid;
+  padding: 10px 0;
+  font-size: 13px;
+  cursor: pointer;
+  color: #4a4a4a;
+  position: relative;
+}
+
+
+
+.typ-item .check-ico {
+  position: absolute;
+  left: 10px;
+  color: #ff0000;
+  display: none;
+}
+
+.typ-item.checked-true .check-ico {
+  display: inline-block;
+}
+
+
+.add-right {
+  padding-left: 30px;
+  padding-top: 100px;
 }
  
 
