@@ -335,15 +335,15 @@ function processSubRepos (items) {
 function freshData (time) {
   var diff = (Date.now() - Date.parse(time)) / (3600000 * 24)
   if (diff > 60) {
-    return ['outdated', '过期']
+    return ['outdated', APP.i18('timeOutdated')]
   }
 
   if (diff < 7) {
-    return ['often', '频繁']
+    return ['often', APP.i18('timeFrequently')]
   }
   
 
-  return ['normal', '正常']
+  return ['normal', APP.i18('timeNormal')]
 }
 
 

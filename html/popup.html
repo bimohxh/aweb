@@ -30,7 +30,7 @@
                 
                 <h3>{{item.name}}</h3> 
                 
-                <div class="desc">{{item.description_cn}}</div>
+                <div class="desc">{{i18ngo(item.description_cn, item.description)}}</div>
                 
               </div>
 
@@ -39,7 +39,7 @@
                   <svg class="icon">
                       <use xlink:href="/css/icon.svg#rank-{{item.trend}}"></use>
                   </svg>
-                  <span class="category">{{item.typcd_zh}}</span>
+                  <span class="category">{{i18ngo(item.typcd_zh, item.typcd)}}</span>
                 </li>
                 <li  title="{{i18('repoUsing')}}">
                     <svg class="icon icon-flip-horizontal" >

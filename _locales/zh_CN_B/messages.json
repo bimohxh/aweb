@@ -47,5 +47,14 @@
   },
   "subSuccess": {
     "message": "感谢您的分享，我们会尽快审核"
+  },
+  "timeOutdated": {
+    "message": "过期"
+  },
+  "timeFrequently": {
+    "message": "频繁"
+  },
+  "timeNormal": {
+    "message": "正常"
   }
 }

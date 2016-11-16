@@ -46,5 +46,14 @@
   },
   "subSuccess": {
     "message": "Thanks for your share, we will review as soon as possible"
+  },
+  "timeOutdated": {
+    "message": "Outdated"
+  },
+  "timeFrequently": {
+    "message": "Frequently"
+  },
+  "timeNormal": {
+    "message": "Normal"
   }
 }
