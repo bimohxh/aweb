@@ -8,6 +8,15 @@
   </head>
   <body>
     <input type="text" id="searchTxt" autofocus placeholder="Keyword + Enter or type `:`" class="searchTxt" @keyup="keyChange()" @keyup.13="searchGo()" v-model="keyword">
+    
+    <svg class="txt-flag" v-show="action == 'command'">
+      <use xlink:href="/css/icon.svg#command"></use>
+    </svg>
+
+    <svg class="txt-flag" v-show="action == 'search'">
+      <use xlink:href="/css/icon.svg#enter"></use>
+    </svg>
+
     <div class="list-wraper">
       <div v-show="isListRepos && !isring && repos[0].items[0]">
         <div v-for="group in repos">
@@ -26,25 +35,25 @@
               </div>
 
               <ul class="repo-extra">
-                <li  title="趋势">
+                <li  title="{{i18('repoTrend')}}">
                   <svg class="icon">
                       <use xlink:href="/css/icon.svg#rank-{{item.trend}}"></use>
                   </svg>
                   <span class="category">{{item.typcd_zh}}</span>
                 </li>
-                <li  title="在用">
+                <li  title="{{i18('repoUsing')}}">
                     <svg class="icon icon-flip-horizontal" >
                         <use xlink:href="/css/icon.svg#hand-lizard-o"></use>
                     </svg>
                     <span>{{item.using}} </span>
                   </li>  
-                <li  title="Issue响应速度">
+                <li  title="{{i18('repoIssue')}}">
                     <svg class="icon">
                         <use xlink:href="/css/icon.svg#issue"></use>
                     </svg>
                     <span>{{item.issue_friendly}} </span>
                   </li>
-                <li  title="Star数">
+                <li  title="{{i18('repoStar')}}">
                     <svg class="icon">
                         <use xlink:href="/css/icon.svg#favor"></use>
                     </svg>
@@ -56,7 +65,7 @@
         </div>
       </div>
 
-      <div class="no-items" v-show="isListRepos && !isring && !repos[0].items[0]">未找到相关的库</div> 
+      <div class="no-items" v-show="isListRepos && !isring && !repos[0].items[0]">{{i18("searchNotfind")}}</div> 
 
       <! --加载动画 -->
       <div class="loading loading-list" v-show="isring">
@@ -81,18 +90,18 @@
         <div  v-show="current_url && addstatus != 'success'">
           <div class="add-left">
             <template  v-for="item in categorys">
-              <div class="typ-head" > {{item.items[0].rootyp_zh}} </div>
+              <div class="typ-head" > {{i18ngo(item.items[0].rootyp_zh, item.items[0].rootyp)}} </div>
               <div class="typ-item checked-{{checkedtyp == typ.id}}" v-for="typ in item.items" @click="checkTyp(typ)">
               <svg class="icon check-ico">
                   <use xlink:href="/css/icon.svg#arrow"></use>
                 </svg>
-                {{ typ.typcd_zh }}
+                {{i18ngo(typ.typcd_zh, typ.typcd)}}
               </div>
             </template>
           </div>
           <div class="add-right">
             <div>
-              <button type="button" @click="addNewRepo()" v-show="current_url && addstatus == 'ready'">提交当前库</button>
+              <button type="button" @click="addNewRepo()" v-show="current_url && addstatus == 'ready'">{{i18("subTxt")}}</button>
             </div>
           </div>
         </div>
@@ -101,15 +110,15 @@
           <svg>
             <use xlink:href="/css/icon.svg#ban"></use>
           </svg>
-          <p>当前URL格式不满足要求</p> 
-          <p>请前往正确的GitHub仓库地址</p> 
+          <p>{{i18('subError1')}}</p> 
+          <p>{{i18('subError2')}}</p> 
         </div>
 
         <div v-show="addstatus == 'success'" class="submit-success">
           <svg>
             <use xlink:href="/css/icon.svg#success"></use>
           </svg>
-          <p>感谢您的分享，我们会尽快审核</p>
+          <p>{{i18("subSuccess")}}</p>
         </div>
         
       </div>
@@ -118,26 +127,31 @@
 
       <! --命令说明 -->
       <div v-show="view == 'help'" class="help-wraper">
-          <h3>命令模式</h3>
-          <ul>
-            <li><kbd>:+</kbd> 提交库</li>
-            <li>
-              <kbd>:top</kbd> 获取前端 top100 框架
-              
-            </li>
+          <svg>
+            <use xlink:href="/css/icon.svg#command"></use>
+          </svg>
+          <div class="inner">
+            <h3>{{i18('helpTitle')}}</h3>
+            <ul>
+              <li><kbd>:+</kbd> <p>{{i18('helpSub')}}</P></li>
+              <li>
+                <kbd>:top</kbd> <p>{{i18('helpTop')}}</P>
+                
+              </li>
 
-            <li>
-              <kbd>:s</kbd> 获取所有专题 
-              <ul>
-                <li>
-                  <kbd>:s[:专题名]</kbd> 获取具体某个专题
-                </li>
-              </ul>
-            </li>
-            
-            
-            
-          </ul>
+              <li>
+                <kbd>:s</kbd> <p>{{i18('helpSubject')}}</P> 
+                <ul>
+                  <li>
+                    <kbd>:s[:{{i18('helpSubName')}}]</kbd> <p>{{i18('helpSubRepos')}}</P> 
+                  </li>
+                </ul>
+              </li>
+              
+              
+              
+            </ul>
+          </div>
           
       </div>
     </div>

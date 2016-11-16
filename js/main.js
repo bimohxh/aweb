@@ -17,12 +17,10 @@ $(function () {
       isring: false,
       view: 'repos',
       categorys: [],
+      action: 'command',
       current_url: undefined,
       addstatus: 'ready',
-      checkedtyp: 1,
-      i18: {
-        search_txt: chrome.i18n.getMessage('search_txt')
-      }
+      checkedtyp: 1
     },
     methods: {
       searchGo: function () {
@@ -42,6 +40,12 @@ $(function () {
       },
       checkTyp: function (item) {
         APP.checkedtyp = item.id
+      },
+      i18: function (key) {
+        return chrome.i18n.getMessage(key)
+      },
+      i18ngo: function (zh, en) {
+        return this.i18('lang') === 'zh_CN' ? zh : en
       }
 
     },
@@ -66,9 +70,12 @@ function changeKeyword() {
   store.set('aweb-keyword', APP.keyword)
   if (APP.keyword === '') {
     listLatest()
+    APP.action = 'empty'
+    return
   }
 
   if (APP.keyword[0] === ':') {
+    APP.action = 'command'
     var cmds = APP.keyword.split(':')
     var func = keymap[cmds[1]]
     if (typeof func === 'function') {
@@ -76,6 +83,9 @@ function changeKeyword() {
     } else {
       APP.view = 'help'
     }
+  }
+  else {
+    APP.action = 'search'
   }
 }
 
@@ -115,6 +125,7 @@ function listLatest () {
  * 搜索结果
  */
 function listSearch () {
+  APP.action = 'search'
   APP.view = 'repos'
   cacheStoreFunc('awe-search-' +  APP.keyword, 1, function(callback) {
     APP.isring = true
@@ -360,8 +371,8 @@ function trendData (trend) {
 
 function cacheStoreFunc (key, exp, func, callback) {
   var old = cacheStore.get(key)
-  //if(!old) {
-  if(true) {
+  if(!old) {
+  //if(true) {
     func(function(data) {
       cacheStore.set(key, data, exp)
       callback(data)
