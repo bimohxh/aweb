@@ -7,7 +7,7 @@
     
   </head>
   <body>
-    <input type="text" id="searchTxt" autofocus placeholder="Keyword + Enter or type `:`" class="searchTxt" @keyup="keyChange()" @keyup.13="searchGo()" v-model="keyword">
+    <input type="text" id="searchTxt" autofocus placeholder="Keyword + Enter or type `:`" class="searchTxt" @keyup="keyChange()" @keyup.13="searchGo()" @keydown.40="moveDown()"  v-model="keyword">
     
     <svg class="txt-flag" v-show="action == 'command'">
       <use xlink:href="/css/icon.svg#command"></use>
@@ -17,12 +17,12 @@
       <use xlink:href="/css/icon.svg#enter"></use>
     </svg>
 
-    <div class="list-wraper">
+    <div class="list-wraper" @keydown.40="moveDown()"  @keydown.38="moveUp()"  tabindex="1"  @keydown.13="visit()">
       <div v-show="isListRepos && !isring && repos[0].items[0]">
         <div v-for="group in repos">
           <div class="subtyp" v-show="repos.length > 1">{{group.items[0].rootyp_zh}} - {{group.items[0].typcd_zh}}</div>
           <a href="https://www.awesomes.cn/{{item.link_url}}" target="_blank"  v-for="item in group.items" :key="item.id">
-            <div class="repo-item">
+            <div class="repo-item active-{{checkeditem == $index + 1}}" @mouseover="moveTo($index + 1, true)">
               <div class="innner">
                 <img class="cover" src="{{item.cover_path}}@1e_50w_50h_1c_0i_1o_1x.png" />
                 <span class="fresh {{item.fresh[0]}}" title="{{item.fresh[1]}}" v-show="view == 'repos'"></span>

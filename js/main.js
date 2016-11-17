@@ -13,6 +13,7 @@ $(function () {
     data: {
       keyword: store.get('aweb-keyword'), 
       repos: [],
+      rscount: 0,
       subs: [],
       isring: false,
       view: 'repos',
@@ -20,9 +21,42 @@ $(function () {
       action: 'command',
       current_url: undefined,
       addstatus: 'ready',
-      checkedtyp: 1
+      checkedtyp: 1,
+      checkeditem: 0
     },
     methods: {
+      moveDown: function () {
+        if (APP.checkeditem === 0) {
+          $('#searchTxt').blur()
+          $('.list-wraper').focus()
+        }
+
+        if (APP.checkeditem >= APP.rscount) {
+          return
+        }
+
+        this.moveTo(APP.checkeditem + 1)
+      },
+      moveUp: function () {
+        if (APP.checkeditem <= 1) {
+          return
+        }
+        this.moveTo(APP.checkeditem - 1)
+      },
+      moveTo: function (index, isStay) {
+        var old = APP.checkeditem
+        APP.checkeditem = index
+        if (!isStay) {
+          var distance = $('.repo-item:eq(' + (APP.checkeditem - 1) + ')').offset().top - 300
+          if (old < index && distance <= 0) { return }
+          //if (old > index && distance <= 0) { return }
+          $('html, body').stop().animate({scrollTop: distance}, 300)
+        }
+      },
+      visit: function () {
+        var url = 
+        window.open("http://www.jb51.net");
+      },
       searchGo: function () {
         var keyword = APP.keyword.trim()
         if (keyword === '' || keyword[0] === ':') {
@@ -231,6 +265,8 @@ function groupSubjectRepos (items) {
 
 // 普通库的归类
 function groupRepos (items) {
+  APP.rscount = items.length
+  APP.checkeditem = 0
   items.forEach(function(item) {
     processRepo(item)
   })
@@ -274,7 +310,7 @@ function dealTypes (items) {
   items.forEach(function (item) {
     var old = cates.find(function (cate) {
       return cate.key === item.rootyp
-    })
+    }) 
 
     if (old) {
       old.items.push(item)
