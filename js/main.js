@@ -1,6 +1,6 @@
 var APP;
 var baseUrl = 'https://www.awesomes.cn/'
-//var baseUrl = 'http://192.168.141.128:3000/'
+var baseUrl = 'http://192.168.26.128:2000/'
 var keymap = {
   'top': listTop,
   's': listSubject,
@@ -26,10 +26,8 @@ $(function () {
     },
     methods: {
       moveDown: function () {
-        if (APP.checkeditem === 0) {
-          $('#searchTxt').blur()
-          $('.list-wraper').focus()
-        }
+        $('#searchTxt').blur()
+        $('.list-wraper').focus()
 
         if (APP.checkeditem >= APP.rscount) {
           return
@@ -44,6 +42,7 @@ $(function () {
         this.moveTo(APP.checkeditem - 1)
       },
       moveTo: function (index, isStay) {
+        if (APP.repos.length > 1) { return false }
         var old = APP.checkeditem
         APP.checkeditem = index
         if (!isStay) {
@@ -191,8 +190,6 @@ function listTop () {
 /**
  * 获取专题列表
  */
-
-
 function listSubject (subject) {
   cacheStoreFunc('awe-subjects', 1, function(callback) {
     APP.isring = true

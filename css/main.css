@@ -141,9 +141,19 @@ kbd {
   border-radius: 4px;
 }
 
+.subject {
+  padding: 50px;
+}
+
 .sub-item {
   text-align: center;
-  border-bottom: #DDD 1px solid
+  position: relative;
+  margin-bottom: 20px;
+  display: block
+}
+
+.sub-item .cover {
+  display: block
 }
 
 .subtyp {
@@ -158,7 +168,13 @@ kbd {
 
 .sub-key {
   margin: 0;
-  padding: 20px 0;
+  padding: 15px 0;
+  position: absolute;
+  bottom: 0px;
+  background-color: rgba(0, 0, 0, 0.51);
+  width: 100%;
+  color: #FFF;
+  font-size: 20px;
 }
 
 .no-items {
