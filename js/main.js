@@ -1,6 +1,6 @@
 var APP;
 var baseUrl = 'https://www.awesomes.cn/'
-var baseUrl = 'http://192.168.26.128:2000/'
+//var baseUrl = 'http://192.168.141.128:3000/'
 var keymap = {
   'top': listTop,
   's': listSubject,
@@ -53,8 +53,10 @@ $(function () {
         }
       },
       visit: function () {
-        var url = 
-        window.open("http://www.jb51.net");
+        var item = APP.repos[0].items[APP.checkeditem - 1]
+        if (item) {
+          window.open('https://www.awesomes.cn/' + item.link_url)
+        }
       },
       searchGo: function () {
         var keyword = APP.keyword.trim()

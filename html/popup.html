@@ -7,7 +7,7 @@
     
   </head>
   <body>
-    <input type="text" id="searchTxt" autofocus placeholder="Keyword + Enter or type `:`" class="searchTxt" @keyup="keyChange()" @keyup.13="searchGo()" @keydown.40="moveDown()"  v-model="keyword">
+    <input type="text" id="searchTxt" autofocus placeholder="Keyword + Enter or type `:`" class="searchTxt" @keydown="keyChange()" @keyup.13="searchGo()" @keydown.40="moveDown()"  v-model="keyword">
     
     <svg class="txt-flag" v-show="action == 'command'">
       <use xlink:href="/css/icon.svg#command"></use>
