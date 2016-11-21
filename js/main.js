@@ -347,6 +347,9 @@ function processRepo (item) {
 
 function processSubRepos (items) {
   var subjects = []
+  items.sort(function (a, b) {
+    return b.stargazers_count - a.stargazers_count
+  })
   items.forEach(function (item) {
     processRepo(item)
     var key = item.rootyp + '-' + item.typcd
