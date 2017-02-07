@@ -24,7 +24,7 @@
           <a href="https://www.awesomes.cn/{{item.link_url}}" target="_blank"  v-for="item in group.items" :key="item.id">
             <div class="repo-item active-{{checkeditem == $index + 1 && repos.length == 1}}" @mouseover="moveTo($index + 1, true)">
               <div class="innner">
-                <img class="cover" src="{{item.cover_path}}@1e_50w_50h_1c_0i_1o_1x.png" />
+                <img class="cover" src="{{item.cover_path}}?x-oss-process=style/repo-50" />
                 <span class="fresh {{item.fresh[0]}}" title="{{item.fresh[1]}}" v-show="view == 'repos'"></span>
                 <i class="rank" v-show="view == 'tops'">{{$index + 1}}</i>
                 
@@ -79,7 +79,7 @@
       <! --专题列表 -->
       <div class="subject" v-show="view == 'subject'">
         <a class="sub-item" v-for="item in subs" href="http://www.awesomes.cn/subject/{{item.key}}" target="_blank">
-          <img src="{{item.cover_path}}@1e_300w_160h_1c_0i_1o_1x.png" class="cover">
+          <img src="{{item.cover_path}}?x-oss-process=style/app_subject" class="cover">
           <h3 class="sub-key">{{item.key}}</h3>
         </a>
       </div>
