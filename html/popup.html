@@ -7,7 +7,7 @@
     
   </head>
   <body>
-    <input type="text" id="searchTxt" autofocus placeholder="Keyword + Enter or type `:`" class="searchTxt" @keydown="keyChange()" @keyup.13="searchGo()" @keydown.40="moveDown()"  v-model="keyword">
+    <input type="text" id="searchTxt" autofocus placeholder="Keyword + Enter or type `:`" class="searchTxt"  @keyup.13="searchGo()" @keydown.40="moveDown()"  v-model="keyword">
     
     <svg class="txt-flag" v-show="action == 'command'">
       <use xlink:href="/css/icon.svg#command"></use>
@@ -24,7 +24,7 @@
           <a href="https://www.awesomes.cn/{{item.link_url}}" target="_blank"  v-for="item in group.items" :key="item.id">
             <div class="repo-item active-{{checkeditem == $index + 1 && repos.length == 1}}" @mouseover="moveTo($index + 1, true)">
               <div class="innner">
-                <img class="cover" src="{{item.cover_path}}?x-oss-process=style/repo-50" />
+                <img class="cover" src="{{cdn(item.cover, 'repo', 'repo-50')}}" />
                 <span class="fresh {{item.fresh[0]}}" title="{{item.fresh[1]}}" v-show="view == 'repos'"></span>
                 <i class="rank" v-show="view == 'tops'">{{$index + 1}}</i>
                 
@@ -67,7 +67,7 @@
 
       <div class="no-items" v-show="isListRepos && !isring && !repos[0].items[0]">{{i18("searchNotfind")}}</div> 
 
-      <! --加载动画 -->
+      <!--加载动画 -->
       <div class="loading loading-list" v-show="isring">
         <div></div>
         <div></div>
@@ -76,15 +76,15 @@
         <div></div>
       </div>
 
-      <! --专题列表 -->
+      <!--专题列表 -->
       <div class="subject" v-show="view == 'subject'">
         <a class="sub-item" v-for="item in subs" href="http://www.awesomes.cn/subject/{{item.key}}" target="_blank">
-          <img src="{{item.cover_path}}?x-oss-process=style/app_subject" class="cover">
+          <img src="{{cdn(item.cover, 'subject', 'app_subject')}}" class="cover">
           <h3 class="sub-key">{{item.key}}</h3>
         </a>
       </div>
 
-      <! --添加repo -->
+      <!--添加repo -->
       <div v-show="view == 'add'" class="add-wraper">
         <div  v-show="current_url && addstatus != 'success'">
           <div class="add-left">
@@ -124,7 +124,7 @@
 
       
 
-      <! --命令说明 -->
+      <!--命令说明 -->
       <div v-show="view == 'help'" class="help-wraper">
           <svg>
             <use xlink:href="/css/icon.svg#command"></use>

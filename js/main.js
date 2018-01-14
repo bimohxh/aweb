@@ -1,6 +1,6 @@
 var APP;
 var baseUrl = 'https://www.awesomes.cn/'
-//var baseUrl = 'http://192.168.141.128:3000/'
+baseUrl = 'http://192.168.26.128:5010/'
 var keymap = {
   'top': listTop,
   's': listSubject,
@@ -11,7 +11,7 @@ $(function () {
   APP = new Vue({
     el: 'body',
     data: {
-      keyword: store.get('aweb-keyword'), 
+      keyword: store.get('aweb-keyword'),
       repos: [],
       rscount: 0,
       subs: [],
@@ -62,9 +62,8 @@ $(function () {
         var keyword = APP.keyword.trim()
         if (keyword === '' || keyword[0] === ':') {
           changeKeyword()
-          return 
+          return
         }
-
         listSearch()
       },
       addNewRepo: function () {
@@ -81,8 +80,14 @@ $(function () {
       },
       i18ngo: function (zh, en) {
         return this.i18('lang') === 'zh_CN' ? zh : en
+      },
+      cdn: function (name, folder, process) {
+        var url = 'https://awesomes.oss-cn-beijing.aliyuncs.com/' + folder + '/' + name
+        if (process) {
+          url += '?x-oss-process=style/' + process
+        }
+        return url
       }
-
     },
     watch: {
       keyword: function () {
@@ -144,10 +149,10 @@ function init () {
  */
 function listLatest () {
   APP.view = 'repos'
-  cacheStoreFunc('awe-latestrepos', 0.5, function(callback) {
+  cacheStoreFunc('awe-latestrepos', 0.5, function (callback) {
     APP.isring = true
-    $.get(baseUrl + 'api/latest', {}, function(data) {
-      callback(data.items)
+    $.get(baseUrl + 'repo/latest', {}, function (data) {
+      callback(data)
     })
   }, function (data) {
     APP.repos = groupRepos(data)
@@ -155,16 +160,15 @@ function listLatest () {
   })
 }
 
-
 /**
  * 搜索结果
  */
 function listSearch () {
   APP.action = 'search'
   APP.view = 'repos'
-  cacheStoreFunc('awe-search-' +  APP.keyword, 1, function(callback) {
+  cacheStoreFunc('awe-search-' + APP.keyword, 1, function (callback) {
     APP.isring = true
-    $.get(baseUrl + 'api/search?q=' + APP.keyword, {}, function(data) {
+    $.get(baseUrl + 'repo?limit=50&search=' + APP.keyword, {}, function (data) {
       callback(data.items)
     })
   }, function (data) {
@@ -178,10 +182,10 @@ function listSearch () {
  */
 function listTop () {
   APP.view = 'tops'
-  cacheStoreFunc('awe-tops', 0.5, function(callback) {
+  cacheStoreFunc('awe-tops', 0.5, function (callback) {
     APP.isring = true
-    $.get(baseUrl + 'api/top', {}, function(data) {
-      callback(data.items)
+    $.get(baseUrl + 'repo/top100', {}, function (data) {
+      callback(data)
     })
   }, function (data) {
     APP.repos = groupRepos(data)
@@ -193,13 +197,13 @@ function listTop () {
  * 获取专题列表
  */
 function listSubject (subject) {
-  cacheStoreFunc('awe-subjects', 1, function(callback) {
+  cacheStoreFunc('awe-subjects', 1, function (callback) {
     APP.isring = true
-    $.get(baseUrl + 'api/subjects', {}, function(data) {
-      data.items.forEach(function(item) {
+    $.get(baseUrl + 'subject', {}, function (data) {
+      data.forEach(function (item) {
         processRepo(item)
       })
-      callback(data.items)
+      callback(data)
     })
   }, function (data) {
     APP.subs = data
@@ -395,13 +399,12 @@ function trendData (trend) {
     return 2
   }
 
-  if(trend > 0) {
+  if (trend > 0) {
     return 1
   }
 
   return 0
 }
-
 
 /**
  * 缓存策略
@@ -409,9 +412,9 @@ function trendData (trend) {
 
 function cacheStoreFunc (key, exp, func, callback) {
   var old = cacheStore.get(key)
-  if(!old) {
-  //if(true) {
-    func(function(data) {
+  if (!old) {
+  // if (true) {
+    func(function (data) {
       cacheStore.set(key, data, exp)
       callback(data)
     })
@@ -420,19 +423,18 @@ function cacheStoreFunc (key, exp, func, callback) {
   }
 }
 
-
 var cacheStore = {
-    set: function(key, val, exp) {
-        exp = exp * 24 * 3600 * 1000
-        store.set(key, { val:val, exp: exp, time:new Date().getTime() })
-    },
-    get: function(key) {
-        var info = store.get(key)
-        if (!info) { return null }
-        if (new Date().getTime() - info.time > info.exp) {
-          store.remove(key)
-          return null
-        }
-        return info.val
+  set: function (key, val, exp) {
+    exp = exp * 24 * 3600 * 1000
+    store.set(key, { val: val, exp: exp, time: new Date().getTime() })
+  },
+  get: function (key) {
+    var info = store.get(key)
+    if (!info) { return null }
+    if (new Date().getTime() - info.time > info.exp) {
+      store.remove(key)
+      return null
     }
+    return info.val
+  }
 }

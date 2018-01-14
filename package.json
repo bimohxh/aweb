@@ -1,6 +1,6 @@
 {
   "name": "aweb",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Front web framework search engine",
   "main": "index.js",
   "scripts": {
